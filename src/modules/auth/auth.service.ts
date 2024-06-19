@@ -15,7 +15,7 @@ export class AuthService {
   async signin(signinDto: SignInDto) {
     const { email, password } = signinDto;
 
-    const user = await this.usersRepo.findByEmail(email);
+    const user = await this.usersRepo.findUnique({ where: { email } });
 
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
@@ -33,7 +33,7 @@ export class AuthService {
   }
 
   async signup(signUpDto: SignupDto) {
-    const emailTaken = await this.usersRepo.findByEmail(signUpDto.email);
+    const emailTaken = await this.usersRepo.findUnique({ where: { email: signUpDto.email } });
 
     if (emailTaken) {
       throw new ConflictException('Email already taken');
