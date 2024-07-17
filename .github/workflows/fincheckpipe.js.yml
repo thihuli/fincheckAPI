@@ -1,0 +1,52 @@
+#nome da pipeline
+name: PipeFincheck
+
+#descreve onde dever ser disparado o pipeline
+#no caso toda vez que houver push na master ou pull_request para master
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+# onde de fato acontece os trabalho a serem executados no pipeline, as tarefas a serem executadas
+jobs:
+# no do job
+  ci:
+
+    runs-on: ubuntu-latest
+#roda a aplicao em varias versoes diferentes do node para garantir que esteja funcional
+#    strategy:
+#      matrix:
+#        node-version: [14.x, 16.x, 18.x]
+# define os passos a serem tomados pelo strategy
+#    steps:
+#       faz o checkout do código para dentro da maquina virtual
+#      - uses: actions/checkout@v3
+#       nome a ser exebido no terminal quando o processo começa
+#      - name: Use Node.js ${{ matrix.node-version }}
+#         faz o setup do node na maquina virtual
+#        uses: actions/setup-node@v4
+#        with:
+#          node-version: ${{ matrix.node-version }}
+#          cache: 'npm'
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js 18.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18.x'
+        cache: 'yarn'
+    # está removendo o script que não deseja ser executado
+    - run: npm pkg delete scripts.prepare
+    # nome do passo a ser executado
+    - name: Install dependencies
+    # faz uma instalação limpa do node sem modificar o package.lock
+    # npm ci ou yarn install --fronzen-lockfile
+      run: yarn install --fronzen-lockfile
+
+    - name: Typechecking
+      run: yarn typechecking
+
+    - name: Tests
+      run: yarn test
