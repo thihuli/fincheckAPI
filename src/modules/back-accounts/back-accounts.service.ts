@@ -1,11 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { CreateBackAccountDto } from './dto/create-back-account.dto';
 import { UpdateBackAccountDto } from './dto/update-back-account.dto';
+import { BankAccountRepository } from 'src/shared/database/repositories/bank-account.repositories';
 
 @Injectable()
 export class BackAccountsService {
-  create(createBackAccountDto: CreateBackAccountDto) {
-    return 'This action adds a new backAccount';
+  constructor(private readonly banlAccountRepository: BankAccountRepository) {}
+
+  create(userId: string,createBackAccountDto: CreateBackAccountDto) {
+    const { color, initialBalance, name, type } = createBackAccountDto;
+    return this.banlAccountRepository.create({
+      data: {
+        type,
+        name,
+        color,
+        userId,
+        initialBalance
+      }
+    });
   }
 
   findAll() {
